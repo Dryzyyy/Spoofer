@@ -1,7 +1,7 @@
 // Aperçu navigateur (`npm run dev` hors Tauri) : simule le backend Rust avec des données fictives.
 // Options d'URL : ?admin=0 (sans droits admin), ?down=1 (backend en panne).
 import { emit } from "@tauri-apps/api/event";
-import { mockIPC } from "@tauri-apps/api/mocks";
+import { mockIPC, mockWindows } from "@tauri-apps/api/mocks";
 
 const q = new URLSearchParams(location.search);
 const admin = q.get("admin") !== "0";
@@ -44,9 +44,18 @@ function dashboard() {
   };
 }
 
+mockWindows("main");
+let maximized = false;
+
 mockIPC(
   async (cmd, args) => {
     const a = (args ?? {}) as Record<string, unknown>;
+    if (cmd === "plugin:window|is_maximized") return maximized;
+    if (cmd === "plugin:window|toggle_maximize") {
+      maximized = !maximized;
+      return emit("tauri://resize", { width: 1180, height: 820 });
+    }
+    if (cmd.startsWith("plugin:window|")) return null;
     if (down && cmd !== "get_settings" && cmd !== "save_settings") throw "backend injoignable";
     switch (cmd) {
       case "get_dashboard": {

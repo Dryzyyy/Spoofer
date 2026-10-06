@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Icon, Sprite } from "./components/Icon";
 import Nav from "./components/Nav";
+import TitleBar from "./components/TitleBar";
 import Toasts from "./components/Toasts";
 import { useGhostnet } from "./hooks/useGhostnet";
 import { useRoute, type Route } from "./hooks/useRoute";
@@ -83,7 +84,10 @@ export default function App() {
         <div className="bg-grain" />
       </div>
       <Sprite />
-      {s && <Shell s={s} saves={saves} patch={patch} flush={flush} />}
+      <div className="shell">
+        <TitleBar />
+        {s && <Shell s={s} saves={saves} patch={patch} flush={flush} />}
+      </div>
       <Toasts />
     </>
   );

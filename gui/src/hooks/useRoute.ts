@@ -13,7 +13,7 @@ export function useRoute(): Route {
   useEffect(() => {
     const on = () => {
       setRoute(read());
-      scrollTo({ top: 0 });
+      document.querySelector(".stage")?.scrollTo({ top: 0 });
     };
     addEventListener("hashchange", on);
     return () => removeEventListener("hashchange", on);

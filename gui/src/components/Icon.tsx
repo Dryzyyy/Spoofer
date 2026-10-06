@@ -26,6 +26,9 @@ export function Sprite() {
       <symbol id="i-circle-alert" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" /><path d="M12 7v6M12 16.5h.01" /></symbol>
       <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" /><path d="M12 11v5M12 8h.01" /></symbol>
       <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" /></symbol>
+      <symbol id="i-minus" viewBox="0 0 24 24"><path d="M5 12h14" /></symbol>
+      <symbol id="i-square" viewBox="0 0 24 24"><rect x="5" y="5" width="14" height="14" rx="2" /></symbol>
+      <symbol id="i-restore" viewBox="0 0 24 24"><rect x="4" y="9" width="11" height="11" rx="2" /><path d="M9 9V6a2 2 0 0 1 2-2h7a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-3" /></symbol>
       <symbol id="i-upload" viewBox="0 0 24 24"><path d="M12 16V4M7 9l5-5 5 5M4 17v3h16v-3" /></symbol>
       <symbol id="i-app" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="14" rx="2" /><path d="M8 21h8M12 18v3" /></symbol>
       <symbol id="i-file" viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8l-5-5z" /><path d="M14 3v5h5" /></symbol>
