@@ -335,7 +335,7 @@ fn do_mask_on(app: &tauri::AppHandle) -> Result<(), String> {
     let srv = proxy::proxy_server_string(&g("ptype"), &g("phost"), &g("pport"));
     let bypass = net::parse_bypass(&g("bypass_apps"));
     if (method == "tun_proxy" || method == "tun_wg") && !admin {
-        return Err("Le TUN exige ADMIN — relance via run-admin.bat (clic-droit → admin). Sans admin, seul le mode « Proxy seul » fonctionne.".into());
+        return Err("Le TUN exige les droits administrateur : relance l'app en admin. Sans admin, seul le mode « Proxy seul » fonctionne.".into());
     }
     if method == "tun_wg" {
         let path = g("wg_path");

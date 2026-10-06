@@ -405,7 +405,7 @@ pub fn start() -> Result<u32, String> {
         let tail = std::fs::read_to_string(&logp).unwrap_or_default();
         let tail: String = tail.chars().rev().take(1500).collect::<String>().chars().rev().collect();
         if tail.contains("Access is denied") {
-            return Err("TUN refusé par Windows (Access denied) : relance l'app EN ADMINISTRATEUR via run-admin.bat. Sans admin, le pilote TUN ne peut pas se créer.".into());
+            return Err("TUN refusé par Windows (Access denied) : relance l'app en administrateur. Sans admin, le pilote TUN ne peut pas se créer.".into());
         }
         let short: String = tail.chars().rev().take(500).collect::<String>().chars().rev().collect();
         return Err(format!("Le TUN est mort au démarrage : {}", if short.trim().is_empty() { "voir sing-tun.log" } else { short.trim() }));

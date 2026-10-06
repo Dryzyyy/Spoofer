@@ -50,7 +50,12 @@ export const api = {
 };
 
 export function methodLabel(m?: string) {
-  if (m === "proxy") return "proxy seul";
+  if (m === "proxy") return "Proxy seul";
   if (m === "tun_wg") return "TUN → WireGuard";
   return "TUN → proxy";
+}
+
+/** Le backend renvoie les MAC avec des tirets ; l'interface les affiche avec des deux-points. */
+export function colonMac(m: string) {
+  return /^[0-9A-F]{2}([-:][0-9A-F]{2}){5}$/i.test(m) ? m.replace(/-/g, ":").toUpperCase() : m;
 }

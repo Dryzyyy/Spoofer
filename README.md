@@ -6,25 +6,28 @@ via registre + renouvellement DHCP. Un seul exe portable, aucun Python.
 
 ## Lancement
 
-```bat
-D:\Spoofer\run-admin.bat
-```
+Double-clic sur `GhostNet-GUI.exe` : l'exe embarque un manifeste
+`requireAdministrator`, Windows demande donc l'élévation (UAC) à chaque
+lancement. MAC + TUN exigent admin. Réglages persistés dans `settings.json`,
+origine MAC dans `originals.json`.
 
-Sans admin : proxy seul + affichage. MAC + TUN exigent admin (bouton
-« Relancer admin » intégré). Réglages persistés dans `settings.json`, origine
-MAC dans `originals.json`.
+> `npm run tauri dev` lance aussi l'exe avec ce manifeste : le terminal doit
+> être ouvert en administrateur (sinon « requested operation requires
+> elevation », os error 740). `cargo test` n'est pas concerné.
 
 > **Windows Defender** : l'exe non signé qui touche registre/réseau/processus
 > est parfois classé `Trojan:Win32/Wacatac.B!ml` (faux positif) et mis en
-> quarantaine → le `.bat` l'explique. Exclusion en place sur `D:\Spoofer`.
-> Seule une signature de code ferait disparaître l'alerte définitivement.
+> quarantaine. Exclusion en place sur `D:\Spoofer`. Si l'exe disparaît :
+> Sécurité Windows → Protection contre les virus et menaces → Gérer les
+> paramètres → Exclusions → ajouter `D:\Spoofer`, puis restaurer le fichier
+> depuis l'Historique de protection (ou rebuild, voir plus bas). Seule une
+> signature de code ferait disparaître l'alerte définitivement.
 
 ## Dossier
 
 ```
 D:\Spoofer\
-  GhostNet-GUI.exe   <- tout-en-un (frontend React + backend Rust)
-  run-admin.bat      <- lance en admin
+  GhostNet-GUI.exe   <- tout-en-un (frontend React + backend Rust), demande l'admin au lancement
   settings.json      <- réglages par défaut (ptype/phost/pport/méthode/MAC/bypass)
   bin\               <- sing-box.exe, wintun.dll, tor\ (hors git, auto-téléchargés)
   gui\               <- sources (Vite React-TS + src-tauri Rust)
