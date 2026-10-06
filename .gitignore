@@ -1,0 +1,16 @@
+# Moteurs téléchargés (~137 Mo, re-téléchargeables par l'app) : gardés sur disque, hors git
+bin/
+
+# État machine locale (MAC réelles, endpoints VPN, logs) : sur disque uniquement
+originals.json
+sing-tun.json
+sing-tun.pid
+sing-tun.log
+gui-debug.log
+
+# Build outputs (régénérables)
+gui/dist/
+gui/src-tauri/target/
+gui/node_modules/
+__pycache__/
+*.log

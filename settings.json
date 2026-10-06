@@ -1,0 +1,10 @@
+{
+  "ptype": "SOCKS5 (Tor / autre)",
+  "phost": "127.0.0.1",
+  "pport": "9050",
+  "ip_method": "tun_proxy",
+  "wg_path": "",
+  "mac_iface": "Ethernet",
+  "custom_mac": "",
+  "bypass_apps": "Discord.exe"
+}
