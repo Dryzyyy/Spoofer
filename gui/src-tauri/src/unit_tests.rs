@@ -67,6 +67,25 @@ mod tests {
         assert_eq!(cfg["inbounds"][0]["interface_name"], "GhostTUN");
         assert_eq!(cfg["outbounds"][0]["server_port"], 9050);
         assert_eq!(cfg["route"]["final"], "proxy");
+        // sing-box exige version en CHAÎNE ("5"), pas en nombre (bug réel constaté :
+        // "cannot unmarshal number into Go value of type string").
+        assert_eq!(cfg["outbounds"][0]["version"], serde_json::json!("5"));
+        // la config générée doit passer le vrai `sing-box check`
+        let tmp = std::env::temp_dir().join("ghostnet-test-sing.json");
+        std::fs::write(&tmp, serde_json::to_string_pretty(&cfg).unwrap()).unwrap();
+        let exe = crate::paths::spoofer_dir().unwrap().join("bin").join("sing-box.exe");
+        assert!(exe.exists(), "sing-box manquant pour le test");
+        let out = std::process::Command::new(&exe)
+            .args(["check", "-c"])
+            .arg(&tmp)
+            .output()
+            .unwrap();
+        assert!(
+            out.status.success(),
+            "sing-box check refusé: {}",
+            String::from_utf8_lossy(&out.stderr)
+        );
+        let _ = std::fs::remove_file(&tmp);
     }
 
     #[test]

@@ -280,7 +280,7 @@ pub fn build_socks_config(
     out.insert("tag".into(), "proxy".into());
     out.insert("server".into(), host.into());
     out.insert("server_port".into(), port.into());
-    out.insert("version".into(), 5.into());
+    out.insert("version".into(), Value::String("5".into()));
     if !user.is_empty() {
         out.insert("username".into(), user.into());
         out.insert("password".into(), password.into());
