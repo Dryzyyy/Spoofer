@@ -320,6 +320,23 @@ fn get_adapters_split() -> Vec<Adapter> {
     adapters
 }
 
+fn fetch_ip(client: &reqwest::blocking::Client, url: &str) -> Result<String, String> {
+    let t = client
+        .get(url)
+        .send()
+        .map_err(|e| format!("{e}"))?
+        .text()
+        .map_err(|e| format!("{e}"))?;
+    match serde_json::from_str::<Value>(&t) {
+        Ok(Value::Object(o)) => o
+            .get("ip")
+            .and_then(|v| v.as_str())
+            .map(|s| s.to_string())
+            .ok_or_else(|| "réponse vide".to_string()),
+        _ => Err("réponse inattendue".into()),
+    }
+}
+
 pub fn get_public_ip() -> String {
     let client = match reqwest::blocking::Client::builder()
         .timeout(Duration::from_secs(12))
@@ -329,19 +346,13 @@ pub fn get_public_ip() -> String {
         Ok(c) => c,
         Err(e) => return format!("ERR: {e}"),
     };
-    match client.get("https://api.ipify.org?format=json").send() {
-        Ok(r) => match r.text() {
-            Ok(t) => match serde_json::from_str::<Value>(&t) {
-                Ok(Value::Object(o)) => o
-                    .get("ip")
-                    .and_then(|v| v.as_str())
-                    .unwrap_or("ERR: réponse vide")
-                    .to_string(),
-                _ => "ERR: réponse inattendue".into(),
-            },
-            Err(e) => format!("ERR: {e}"),
+    // HTTPS d'abord, repli HTTP (même fournisseur) si le TLS/DNS coince.
+    match fetch_ip(&client, "https://api.ipify.org?format=json") {
+        Ok(ip) => ip,
+        Err(e1) => match fetch_ip(&client, "http://api.ipify.org?format=json") {
+            Ok(ip) => ip,
+            Err(e2) => format!("ERR: {e1} / repli: {e2}"),
         },
-        Err(e) => format!("ERR: {e}"),
     }
 }
 
