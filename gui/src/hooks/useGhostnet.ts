@@ -89,6 +89,11 @@ export function useGhostnet() {
       setBackendDown(false);
       setStatus(ev.payload.status);
       setAdapters(ev.payload.adapters);
+      // Toutes les ~60s l'event contient une IP fraîche : écrase l'erreur
+      // éventuelle du warmup Tor au lieu de rester figé dessus.
+      if (ev.payload.publicIp && !ev.payload.publicIp.startsWith("ERR")) {
+        setPublicIp(ev.payload.publicIp);
+      }
       setTick((n) => n + 1);
     });
     const unLog = listen<string>("ghostnet://log", (ev) => pushLog(ev.payload));

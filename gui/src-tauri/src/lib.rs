@@ -46,13 +46,12 @@ fn compute_masked(adapters: &[net::Adapter]) -> bool {
 
 /// Un seul passage : énumère les adaptateurs UNE fois et construit
 /// statut + liste. Évite de lancer 4 powershell en parallèle à chaque refresh.
-fn dashboard_value(include_public_ip: bool) -> Value {
+/// fresh_adapters=false → cache 45s (polling) ; true → énumération neuve (manuel/ON/OFF).
+fn dashboard_value(include_public_ip: bool, fresh_adapters: bool) -> Value {
     // Les 3 étapes lentes tournent en parallèle : sur cette machine
     // adapters ≈ 3.1s (powershell) et tor.socks ≈ 2.1s (TCP localhost lent
     // à refuser) ; en séquentiel = 5.6s de gel ressenti, en parallèle ≈ 3.2s.
-    // Intervalle (with_ip=false) : adaptateurs cachés 45s → vagues ~1s.
-    // Manuel/ON/OFF (with_ip=true) : énumération fraîche.
-    let fresh = include_public_ip;
+    let fresh = fresh_adapters;
     let (adapters, tor_status, public_ip): (Vec<net::Adapter>, Value, Option<String>) =
         std::thread::scope(|scope| {
             let h_ad = scope.spawn(move || {
@@ -117,7 +116,7 @@ fn dashboard_value(include_public_ip: bool) -> Value {
 }
 
 fn status_value(include_public_ip: bool) -> Value {
-    let d = dashboard_value(false);
+    let d = dashboard_value(false, false);
     let status = d.get("status").cloned().unwrap_or(Value::Null);
     if include_public_ip {
         let mut s = status;
@@ -153,7 +152,7 @@ fn get_status(include_public_ip: Option<bool>) -> Result<Value, String> {
 
 #[tauri::command]
 fn get_adapters() -> Result<Value, String> {
-    Ok(dashboard_value(false)["adapters"].clone())
+    Ok(dashboard_value(false, true)["adapters"].clone())
 }
 
 /// Refresh complet en UN appel (statut + adaptateurs + IP optionnelle).
@@ -162,7 +161,7 @@ fn get_adapters() -> Result<Value, String> {
 fn get_dashboard(with_ip: Option<bool>) -> Result<Value, String> {
     let t0 = std::time::Instant::now();
     dbg::dlog(&format!("get_dashboard(with_ip={}) entrée", with_ip.unwrap_or(false)));
-    let v = dashboard_value(with_ip.unwrap_or(false));
+    let v = dashboard_value(with_ip.unwrap_or(false), true);
     let n = v.get("adapters").and_then(|a| a.as_array()).map(|a| a.len()).unwrap_or(0);
     dbg::dlog(&format!("get_dashboard OK en {}ms ({} adaptateurs)", t0.elapsed().as_millis(), n));
     Ok(v)
@@ -465,9 +464,14 @@ fn relaunch_as_admin() -> Result<String, String> {
 /// Tourne même pendant un masquage (peu coûteux : API native + 1 TCP),
 /// donc l'UI bascule PROTÉGÉ/EXPOSÉ en direct.
 fn poll_loop(app: tauri::AppHandle) {
+    // Toutes les 4 passes (~1 min), on joint une IP publique fraîche :
+    // sans ça l'IP affichée resterait figée sur l'erreur du warmup Tor.
+    // Adaptateurs toujours via cache (zéro powershell), IP seule en frais.
+    let mut tick: u32 = 0;
     loop {
         std::thread::sleep(std::time::Duration::from_secs(15));
-        let v = dashboard_value(false);
+        tick += 1;
+        let v = dashboard_value(tick % 4 == 0, false);
         let _ = app.emit("ghostnet://state", v);
     }
 }
